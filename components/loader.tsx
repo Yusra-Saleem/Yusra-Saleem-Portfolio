@@ -5,8 +5,10 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 const Loader = () => {
-  const [isLoading, setIsLoading] = useState(true);  useEffect(() => {
-    // Setting a longer timer for better animation visibility
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Loader stays long, but doesn’t block LCP
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 7000);
@@ -22,12 +24,14 @@ const Loader = () => {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.8 }}
       className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background overflow-hidden px-4"
+      role="status"
+      aria-label="Loading portfolio"
     >
-      {/* Animated background grid - made responsive */}
+      {/* Background grid */}
       <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:30px_30px] sm:bg-[size:50px_50px] animate-grid-flow" />
-      
-      {/* Animated particles */}
-      <div className="absolute inset-0 animate-particles">
+
+      {/* Particles */}
+      <div className="absolute inset-0 animate-particles" aria-hidden="true">
         {[...Array(20)].map((_, i) => (
           <div
             key={i}
@@ -43,8 +47,8 @@ const Loader = () => {
         ))}
       </div>
 
-      {/* Glowing circles */}
-      <div className="absolute inset-0">
+      {/* Glowing circle */}
+      <div className="absolute inset-0" aria-hidden="true">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
           <motion.div
             animate={{
@@ -62,14 +66,14 @@ const Loader = () => {
         </div>
       </div>
 
-      {/* Profile Image with Tech Border - adjusted sizes for mobile */}
+      {/* Profile Image */}
       <motion.div
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.8 }}
         className="relative w-28 h-28 sm:w-40 sm:h-40 mb-6 sm:mb-8"
       >
-        {/* Orbital rings - adjusted for mobile */}
+        {/* Orbital rings */}
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
@@ -80,63 +84,68 @@ const Loader = () => {
           transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
           className="absolute -inset-6 sm:-inset-8 border-2 border-dashed border-primary/10 rounded-full"
         />
-        
-        {/* Image container - maintained aspect ratio */}
+
+        {/* Optimized Image container */}
         <div className="absolute inset-0 rounded-full animate-border bg-gradient-to-r from-primary via-primary/50 to-primary bg-[length:200%_200%]">
           <div className="absolute inset-1 rounded-full overflow-hidden bg-background/80 backdrop-blur-sm">
-            <Image              src="/loader.webp"
-              alt="Yusra Saleem - Frontend Developer"
+            <Image
+              src="/loader.webp"
+              alt="Loading profile"
               fill
               className="object-cover"
-              priority
-              loading="eager"
+              // ❌ Removed priority (blocks LCP)
+              // ✅ Added decoding + fetchPriority
+              decoding="async"
+              fetchPriority="low"
+              loading="lazy"
               sizes="(max-width: 768px) 112px, 160px"
             />
           </div>
         </div>
       </motion.div>
 
-      {/* Animated Text - responsive font size */}
+      {/* Animated Text */}
       <div className="relative w-full max-w-[320px] sm:max-w-none text-center">
-        {/* Container div for the line with fixed width */}
         <div className="relative w-[200px] sm:w-[300px] md:w-[450px] mx-auto top-9 md:top-14">
           <motion.div
             initial={{ width: "0%" }}
             animate={{ width: "100%" }}
             transition={{ duration: 1, delay: 0.5 }}
-            className="h-[2px] absolute  left-0 right-0 bg-gradient-to-r from-transparent via-primary to-transparent"
+            className="h-[2px] absolute left-0 right-0 bg-gradient-to-r from-transparent via-primary to-transparent"
           />
         </div>
-        
-        {/* Rest of your text animation code */}
+
         <div className="flex justify-center space-x-1 sm:space-x-3 top-5">
-          {["Y", "U", "S", "R", "A", " ", "S", "A", "L", "E", "E", "M"].map((letter, index) => (
-            <motion.span
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ 
-                opacity: 1, 
-                y: 0,
-                rotateY: [0, 360],
-                transition: {
-                  rotateY: {
-                    delay: index * 0.1,
-                    duration: 0.8,
-                    repeat: Infinity,
-                    repeatDelay: 5
-                  }
-                }
-              }}
-              className="text-2xl sm:text-4xl font-bold text-primary relative cursor-default perspective"
-            >
-              {letter}
-            </motion.span>
-          ))}
+          {["Y", "U", "S", "R", "A", " ", "S", "A", "L", "E", "E", "M"].map(
+            (letter, index) => (
+              <motion.span
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                  rotateY: [0, 360],
+                  transition: {
+                    rotateY: {
+                      delay: index * 0.1,
+                      duration: 0.8,
+                      repeat: Infinity,
+                      repeatDelay: 5,
+                    },
+                  },
+                }}
+                className="text-2xl sm:text-4xl font-bold text-primary relative cursor-default perspective"
+                aria-hidden="true"
+              >
+                {letter}
+              </motion.span>
+            )
+          )}
         </div>
       </div>
 
-      {/* Loading Progress Bar - made responsive */}
-      <div className="relative mt-8 sm:mt-12 w-[80%] max-w-[12rem]">
+      {/* Progress Bar */}
+      <div className="relative mt-8 sm:mt-12 w-[80%] max-w-[12rem]" aria-hidden="true">
         <motion.div
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
@@ -144,9 +153,7 @@ const Loader = () => {
           className="h-0.5 bg-primary/50 rounded-full overflow-hidden"
         >
           <motion.div
-            animate={{
-              x: ["-100%", "100%"],
-            }}
+            animate={{ x: ["-100%", "100%"] }}
             transition={{
               duration: 1.5,
               repeat: Infinity,
