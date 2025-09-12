@@ -1,17 +1,20 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Image from "next/image";
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
+
+// ✅ Lazy load Next/Image to avoid blocking LCP
+const Image = dynamic(() => import("next/image"), { ssr: false });
 
 const Loader = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Loader stays long, but doesn’t block LCP
+    // Shorter loader duration to reduce blocking of LCP
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 7000);
+    }, 2500); // ⬅️ Reduced from 7000ms
 
     return () => clearTimeout(timer);
   }, []);
@@ -22,17 +25,20 @@ const Loader = () => {
     <motion.div
       initial={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.8 }}
+      transition={{ duration: 0.6 }}
       className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background overflow-hidden px-4"
+      aria-busy="true"
       role="status"
-      aria-label="Loading portfolio"
     >
-      {/* Background grid */}
-      <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:30px_30px] sm:bg-[size:50px_50px] animate-grid-flow" />
+      {/* Animated background grid */}
+      <div
+        className="absolute inset-0 bg-grid-white/[0.02] bg-[size:30px_30px] sm:bg-[size:50px_50px] animate-grid-flow"
+        aria-hidden="true"
+      />
 
-      {/* Particles */}
+      {/* Animated particles */}
       <div className="absolute inset-0 animate-particles" aria-hidden="true">
-        {[...Array(20)].map((_, i) => (
+        {Array.from({ length: 15 }).map((_, i) => (
           <div
             key={i}
             className="particle absolute bg-primary/30"
@@ -41,39 +47,34 @@ const Loader = () => {
               top: `${Math.random() * 100}%`,
               width: `${Math.random() * 6 + 1}px`,
               height: `${Math.random() * 6 + 1}px`,
-              animationDelay: `${Math.random() * 2}s`
+              animationDelay: `${Math.random() * 2}s`,
             }}
           />
         ))}
       </div>
 
-      {/* Glowing circle */}
+      {/* Glowing circles */}
       <div className="absolute inset-0" aria-hidden="true">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
           <motion.div
             animate={{
               scale: [1, 1.2, 1],
               opacity: [0.3, 0.5, 0.3],
-              rotate: [0, 180, 360]
+              rotate: [0, 180, 360],
             }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             className="absolute -inset-20 rounded-full bg-primary/20 blur-xl"
           />
         </div>
       </div>
 
-      {/* Profile Image */}
+      {/* Profile Image with Tech Border */}
       <motion.div
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.8 }}
+        transition={{ duration: 0.6 }}
         className="relative w-28 h-28 sm:w-40 sm:h-40 mb-6 sm:mb-8"
       >
-        {/* Orbital rings */}
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
@@ -85,18 +86,14 @@ const Loader = () => {
           className="absolute -inset-6 sm:-inset-8 border-2 border-dashed border-primary/10 rounded-full"
         />
 
-        {/* Optimized Image container */}
         <div className="absolute inset-0 rounded-full animate-border bg-gradient-to-r from-primary via-primary/50 to-primary bg-[length:200%_200%]">
           <div className="absolute inset-1 rounded-full overflow-hidden bg-background/80 backdrop-blur-sm">
             <Image
               src="/loader.webp"
-              alt="Loading profile"
+              alt="Yusra Saleem - Frontend Developer"
               fill
               className="object-cover"
-              // ❌ Removed priority (blocks LCP)
-              // ✅ Added decoding + fetchPriority
-              decoding="async"
-              fetchPriority="low"
+              priority={false} // ⬅️ prevent blocking LCP
               loading="lazy"
               sizes="(max-width: 768px) 112px, 160px"
             />
@@ -110,7 +107,7 @@ const Loader = () => {
           <motion.div
             initial={{ width: "0%" }}
             animate={{ width: "100%" }}
-            transition={{ duration: 1, delay: 0.5 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
             className="h-[2px] absolute left-0 right-0 bg-gradient-to-r from-transparent via-primary to-transparent"
           />
         </div>
@@ -144,21 +141,17 @@ const Loader = () => {
         </div>
       </div>
 
-      {/* Progress Bar */}
+      {/* Loading Progress Bar */}
       <div className="relative mt-8 sm:mt-12 w-[80%] max-w-[12rem]" aria-hidden="true">
         <motion.div
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
-          transition={{ duration: 7, ease: "easeInOut" }}
+          transition={{ duration: 2.5, ease: "easeInOut" }}
           className="h-0.5 bg-primary/50 rounded-full overflow-hidden"
         >
           <motion.div
             animate={{ x: ["-100%", "100%"] }}
-            transition={{
-              duration: 1.5,
-              repeat: Infinity,
-              ease: "linear",
-            }}
+            transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
             className="w-16 h-full bg-gradient-to-r from-transparent via-primary to-transparent"
           />
         </motion.div>
