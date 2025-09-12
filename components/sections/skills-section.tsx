@@ -11,7 +11,8 @@ const SkillCard = ({ skill, index, isVisible }: {
   isVisible: boolean;
 }) => {
   const Icon = skill.icon;
-  
+  const uniqueId = `skill-${skill.id}-${index}`;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -27,6 +28,8 @@ const SkillCard = ({ skill, index, isVisible }: {
         transition: { duration: 0.2 }
       }}
       data-aos="fade-up"
+      role="listitem"
+      aria-labelledby={`${uniqueId}-title`}
       className={cn(
         "group relative p-6",
         "bg-gradient-to-br from-background/80 via-background/50 to-background/80",
@@ -37,16 +40,13 @@ const SkillCard = ({ skill, index, isVisible }: {
         "overflow-hidden"
       )}
     >
-      {/* Multi-layered glowing effect */}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-primary/20 blur-xl" />
         <div className="absolute inset-0 bg-gradient-to-tl from-primary/20 via-transparent to-primary/20 blur-xl" />
       </div>
 
-      {/* Animated border glow */}
       <div className="absolute inset-px rounded-2xl bg-gradient-to-br from-primary/50 via-transparent to-primary/50 opacity-0 group-hover:opacity-100 animate-border-flow" />
       
-      {/* Floating particles */}
       <div className="absolute inset-0 overflow-hidden">
         {[...Array(5)].map((_, i) => (
           <div
@@ -65,10 +65,8 @@ const SkillCard = ({ skill, index, isVisible }: {
         ))}
       </div>
 
-      {/* Content wrapper */}
       <div className="relative z-10">
-        {/* Icon with glow effect */}
-        <motion.div 
+        <motion.div
           className={cn(
             "mb-4 relative",
             "before:absolute before:inset-0 before:blur-xl before:opacity-0 before:group-hover:opacity-100",
@@ -78,11 +76,15 @@ const SkillCard = ({ skill, index, isVisible }: {
           whileHover={{ scale: 1.1 }}
           transition={{ type: "spring", stiffness: 300 }}
         >
-          <Icon className="w-12 h-12 relative z-10" />
+          <Icon
+            className="w-12 h-12 relative z-10"
+            aria-hidden="true"
+            focusable="false"
+          />
         </motion.div>
         
-        {/* Skill name with color transition */}
-        <motion.h3 
+        <motion.h3
+          id={`${uniqueId}-title`}
           className={cn(
             "text-lg font-semibold mb-2",
             "transition-colors duration-300",
@@ -92,7 +94,6 @@ const SkillCard = ({ skill, index, isVisible }: {
           {skill.name}
         </motion.h3>
         
-        {/* Details with stagger animation */}
         <motion.div 
           className="space-y-1"
           initial="hidden"
@@ -137,16 +138,15 @@ const SkillsSection = () => {
     : skills;
 
   return (
-    <section 
+    <section
       ref={sectionRef}
-      id="skills" 
+      id="skills"
       className="py-24 relative overflow-hidden"
+      aria-label="Technical Expertise"
     >
-      {/* Enhanced background effects */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
       <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
       
-      {/* Multiple layered glowing orbs */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
         <div className="w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] animate-pulse-slow" />
         <div className="absolute inset-0 w-[600px] h-[600px] bg-primary/3 rounded-full blur-[90px] animate-pulse-slow animation-delay-1000" />
@@ -154,7 +154,6 @@ const SkillsSection = () => {
       </div>
 
       <div className="container relative z-10 mx-auto px-4">
-        {/* Section header with enhanced glow */}
         <div className="text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -176,8 +175,7 @@ const SkillsSection = () => {
           </motion.div>
         </div>
 
-        {/* Category filters with glow effect */}
-        <motion.div 
+        <motion.div
           className="flex flex-wrap justify-center gap-3 mb-12"
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -187,6 +185,8 @@ const SkillsSection = () => {
           data-aos-delay="400"
         >
           <button
+            type="button"
+            aria-pressed={!activeCategory}
             onClick={() => setActiveCategory(null)}
             className={cn(
               "px-6 py-2 rounded-full text-sm font-medium",
@@ -204,6 +204,8 @@ const SkillsSection = () => {
           {categories.map((category, index) => (
             <button
               key={category}
+              type="button"
+              aria-pressed={activeCategory === category}
               onClick={() => setActiveCategory(category)}
               className={cn(
                 "px-6 py-2 rounded-full text-sm font-medium",
@@ -221,12 +223,12 @@ const SkillsSection = () => {
           ))}
         </motion.div>
 
-        {/* Skills grid */}
         <AnimatePresence mode="wait">
-          <motion.div 
+          <motion.div
             layout
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
             data-aos="fade-up"
+            role="list"
           >
             {filteredSkills.map((skill, index) => (
               <SkillCard

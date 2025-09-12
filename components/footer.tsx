@@ -100,7 +100,7 @@ const Footer = () => {
               </p>
               <p>
                 <a 
-                  href="mailto:hello@example.com"
+                  href="mailto:yusrasaleem679@gmail.com"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
                   yusrasaleem679@gmail.com
