@@ -169,7 +169,7 @@ const AboutSection: React.FC = () => {
               <div className="flex flex-wrap gap-4 mb-8" aria-hidden={prefersReducedMotion} data-aos={prefersReducedMotion ? undefined : "fade-up"}>
                 <div className="flex items-center gap-2 bg-secondary/50 px-4 py-2 rounded-full">
                   <Award className="h-5 w-5 text-primary" aria-hidden="true" />
-                  <span>1+ Years Experience</span>
+                  <span>2+ Years Experience</span>
                 </div>
                 <div className="flex items-center gap-2 bg-secondary/50 px-4 py-2 rounded-full">
                   <Briefcase className="h-5 w-5 text-primary" aria-hidden="true" />
